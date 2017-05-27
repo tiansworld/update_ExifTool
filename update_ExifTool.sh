@@ -34,11 +34,12 @@ targetdir=/usr/local/bin
 # Compare shasums
 if [ "$originsha1sum" == "$calsha1sum" ]; then
     /bin/echo "File checksum OK, proceed to decompress the file\n"
-
     # Decompress the downloaded file if checksum value is correct.
     /usr/local/bin/gtar xvzf $downloadedfile -C $filedir \
-        > $filedir/tarcontent && echo "File Decompressed\n" 
-    tardir=`/usr/local/bin/greadlink -f $(head -1 $filedir/tarcontent)` 
+         --index-file=$filedir/tarcontent && echo "File Decompressed\n" 
+    tardir=`/usr/local/bin/greadlink -f $(printf $filedir"/"$(head -1 $filedir/tarcontent))` 
+    #Added printf to get the full path of the decompressed directory
+    #So the script can be called under any directory.
     /bin/rm $filedir/tarcontent
 
     # Update files under /usr/local/bin, following the instructions
