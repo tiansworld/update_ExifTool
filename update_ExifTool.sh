@@ -2,26 +2,23 @@
 
 # This is a bash script intends to download and update the files of ExifTool
 # automatically for Mac OS, I think it will work on GNU/Linux too,
-# because most of the commands are GNU versions.
+# because most of the commands are GNU versions. But you should change the
+# commands path first.
+
 # This is my first 'long' bash script. I am still learning, you're
 # welcome to leave the advices and suggestions.
 
-# Use curl to download the file
-# curl "http://owl.phy.queensu.ca/~phil/exiftool/Image-ExifTool-*.tar.gz" >\
-#    ~/Downloads/Image-ExifTool.tar.gz
+# Download Image-ExifTool
+vernumber=`/usr/local/Cellar/curl/7.61.0/bin/curl http://owl.phy.queensu.ca/~phil/exiftool/ver.txt` 
+cd ~/Downloads && /usr/local/bin/wget  http://owl.phy.queensu.ca/~phil/exiftool/Image-ExifTool-$vernumber.tar.gz
 
-# Don't know how to get the latest file from the website.
-# Just download the file by using the internet browser first and put 
-# it under ~/Downloads directory.
-
-# Pre-defind variables
+# Checksum
 # Get the source file checksum value, here I use sha1 value of the gz file.
 originsha1sum=`/usr/local/bin/wget -O- -q \
     http://owl.phy.queensu.ca/~phil/exiftool/checksums.txt \
-    |grep -i sha1.*gz |awk '{ FS = "= "} { print $2}'`
+    |grep -i "^SHA1.*$vernumber.tar.gz" |awk '{ FS = "= "} { print $2}'`
 # Get the path and name of downloaded file.
-downloadedfile=`find ~/Downloads -iname 'Image-Exif*.tar.gz' -print|sort \
-    -rn|head -1`
+downloadedfile=~/Downloads/Image-ExifTool-$vernumber.tar.gz
 # Get the file path.
 filedir=`/usr/bin/dirname $downloadedfile`
 # Get the name of the file.
@@ -32,18 +29,21 @@ calsha1sum=`/usr/bin/shasum $downloadedfile |awk '{print $1}'`
 targetdir=/usr/local/bin
 
 # Compare shasums
+echo "Downloaded file sum is: $calsha1sum"
+echo "The sha1 checksum should be: $originsha1sum"
+
 if [ "$originsha1sum" == "$calsha1sum" ]; then
-    /bin/echo "File checksum OK, proceed to decompress the file\n"
+    /bin/echo "File checksums are the same, proceed to decompress the file"
     # Decompress the downloaded file if checksum value is correct.
     /usr/local/bin/gtar xvzf $downloadedfile -C $filedir \
-         --index-file=$filedir/tarcontent && echo "File Decompressed\n" 
+         --index-file=$filedir/tarcontent && echo "File Decompressed" 
     tardir=`/usr/local/bin/greadlink -f $(printf $filedir"/"$(head -1 $filedir/tarcontent))` 
     #Added printf to get the full path of the decompressed directory
     #So the script can be called under any directory.
     /bin/rm $filedir/tarcontent
 
-    # Update files under /usr/local/bin, following the instructions
-    # at http://owl.phy.queensu.ca/~phil/exiftool/install.html
+# Update files under /usr/local/bin, by following the instructions
+# at http://owl.phy.queensu.ca/~phil/exiftool/install.html
     if [ -w /usr/local/bin ]; then
         /bin/cp -r $tardir/exiftool $tardir/lib $targetdir &&\
             /bin/echo "OK, update complete.\n" && exit 0
@@ -54,5 +54,5 @@ if [ "$originsha1sum" == "$calsha1sum" ]; then
     fi
 
 else
-    echo "Checksum not correct, exit now" && exit 0
+    echo "The downloaded file checksum is not correct, exit now" && exit 0
 fi
