@@ -4,18 +4,19 @@
 # automatically for Mac OS, I think it will work on GNU/Linux too,
 # because most of the commands are GNU versions. But you should change the
 # commands path first.
+# I suppose you have Homebrew installed on your machine.
 
 # This is my first 'long' bash script. I am still learning, you're
 # welcome to leave the advices and suggestions.
 
 # Download Image-ExifTool
-vernumber=`/usr/local/Cellar/curl/7.61.0/bin/curl http://owl.phy.queensu.ca/~phil/exiftool/ver.txt` 
-cd ~/Downloads && /usr/local/bin/wget  http://owl.phy.queensu.ca/~phil/exiftool/Image-ExifTool-$vernumber.tar.gz
+vernumber=`/usr/local/Cellar/curl/7.64.1/bin/curl https://www.sno.phy.queensu.ca/~phil/exiftool/ver.txt` 
+cd ~/Downloads && /usr/local/bin/wget  https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-$vernumber.tar.gz
 
 # Checksum
 # Get the source file checksum value, here I use sha1 value of the gz file.
 originsha1sum=`/usr/local/bin/wget -O- -q \
-    http://owl.phy.queensu.ca/~phil/exiftool/checksums.txt \
+    https://www.sno.phy.queensu.ca/~phil/exiftool/checksums.txt \
     |grep -i "^SHA1.*$vernumber.tar.gz" |awk '{ FS = "= "} { print $2}'`
 # Get the path and name of downloaded file.
 downloadedfile=~/Downloads/Image-ExifTool-$vernumber.tar.gz
