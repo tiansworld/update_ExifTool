@@ -10,13 +10,15 @@
 # welcome to leave the advices and suggestions.
 
 # Download Image-ExifTool
-vernumber=`/usr/local/Cellar/curl/7.64.1/bin/curl https://www.sno.phy.queensu.ca/~phil/exiftool/ver.txt` 
-cd ~/Downloads && /usr/local/bin/wget  https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-$vernumber.tar.gz
+echo "Checking Version Number"
+vernumber=`/usr/local/opt/curl/bin/curl https://www.exiftool.org/ver.txt` 
+echo "Downloading"
+cd ~/Downloads && /usr/local/bin/wget  https://www.exiftool.org/Image-ExifTool-$vernumber.tar.gz
 
 # Checksum
 # Get the source file checksum value, here I use sha1 value of the gz file.
 originsha1sum=`/usr/local/bin/wget -O- -q \
-    https://www.sno.phy.queensu.ca/~phil/exiftool/checksums.txt \
+    https://www.exiftool.org/checksums.txt \
     |grep -i "^SHA1.*$vernumber.tar.gz" |awk '{ FS = "= "} { print $2}'`
 # Get the path and name of downloaded file.
 downloadedfile=~/Downloads/Image-ExifTool-$vernumber.tar.gz
